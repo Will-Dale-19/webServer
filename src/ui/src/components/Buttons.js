@@ -34,9 +34,11 @@ Button.defaultProps = {
 
 const ButtonToggle = styled(Button)`
   opacity: 0.7;
+  cursor: default;
   ${({ active }) =>
     active &&
     `
+    cursor: pointer;
     opacity: 1; 
   `}
 `;
@@ -58,9 +60,9 @@ function ToggleGroup() {
                     } else {
                         setActive(types[0])
                     }
+                    changeServerStatus(type)
                 }
                 }>
-
                     {type}
                 </ButtonToggle>
             ))}
@@ -71,6 +73,12 @@ function ToggleGroup() {
 function clickMe() {
     alert("You clicked me!");
 }
+
+function changeServerStatus(type) {
+    alert(type)
+}
+
+
 
 const Buttons = () => {
     return (
