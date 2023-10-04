@@ -48,21 +48,29 @@ const types = ["Start Server", "Stop Server"];
 
 function ToggleGroup() {
     const [active, setActive] = useState(types[0]);
+
     return (
         <div>
             {types.map((type) => (
                 // This makes it so that if you click "start server",
                 // the active type is set to "stop server" to reflect
                 // the server status.
-                <ButtonToggle active={active === type} onClick={()=> {
-                    if (type === types[0]) {
-                        setActive(types[1])
-                    } else {
-                        setActive(types[0])
+                <ButtonToggle
+                    id = {"Button"+type}
+                    active={
+                        active === type
                     }
-                    changeServerStatus(type)
-                }
-                }>
+                    onClick={()=> {
+                        if (type === types[0]) {
+                            setActive(types[1])
+                        } else {
+                            setActive(types[0])
+                        }
+                        changeServerStatus(type)
+                        }
+                    }
+                    disabled = { active !== type}
+                >
                     {type}
                 </ButtonToggle>
             ))}
@@ -77,8 +85,6 @@ function clickMe() {
 function changeServerStatus(type) {
     alert(type)
 }
-
-
 
 const Buttons = () => {
     return (
