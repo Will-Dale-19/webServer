@@ -42,7 +42,8 @@ const Servers = () => {
             })}
             </tbody>
         </table>
-        <Button onClick={clickMe}>Button</Button>
+            <div><Button onClick={clickMe}>Button</Button></div>
+            <div><ToggleGroup /></div>
     </div>
 
     )
@@ -53,10 +54,6 @@ const theme = {
     blue: {
         default: "#3f51b5",
         hover: "#283593"
-    },
-    pink: {
-        default: "#e91e63",
-        hover: "#ad1457"
     }
 };
 
@@ -83,6 +80,39 @@ const Button = styled.button`
 Button.defaultProps = {
     theme: "blue"
 };
+
+const ButtonToggle = styled(Button)`
+  opacity: 0.7;
+  ${({ active }) =>
+    active &&
+    `
+    opacity: 1; 
+  `}
+`;
+
+
+const types = ["Start Server", "Stop Server"];
+
+function ToggleGroup() {
+    const [active, setActive] = useState(types[0]);
+    return (
+        <div>
+            {types.map((type) => (
+                <ButtonToggle active={active === type} onClick={()=> {
+                    if (type === types[0]) {
+                        setActive(types[1])
+                    } else {
+                        setActive(types[0])
+                    }
+                    }
+                }>
+
+                    {type}
+                </ButtonToggle>
+            ))}
+        </div>
+    );
+}
 
 function clickMe() {
     alert("You clicked me!");
