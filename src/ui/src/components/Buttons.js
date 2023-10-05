@@ -43,7 +43,6 @@ const ButtonToggle = styled(Button)`
   `}
 `;
 
-
 const types = ["Start Server", "Stop Server"];
 
 function ToggleGroup() {
@@ -61,11 +60,7 @@ function ToggleGroup() {
                         active === type
                     }
                     onClick={()=> {
-                        if (type === types[0]) {
-                            setActive(types[1])
-                        } else {
-                            setActive(types[0])
-                        }
+                        type === types[0] ? setActive(types[1]) : setActive(types[0]);
                         changeServerStatus(type)
                         }
                     }
