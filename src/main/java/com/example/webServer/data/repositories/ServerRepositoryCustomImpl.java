@@ -19,7 +19,7 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
     @Override
     public List<ServerEntity> findAllServers() {
         // TODO Change from test data
-        File serverLocation = new File("C:/Users/dalew/IdeaProjects/webServer/testData");
+        File serverLocation = new File("testData");
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){

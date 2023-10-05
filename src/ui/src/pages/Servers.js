@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react'
+import Buttons from "../components/Buttons";
 
 const Servers = () => {
     const [servers, setServers] = useState([])
@@ -13,7 +14,9 @@ const Servers = () => {
             console.log('error fetching customers: ' + e);
         })
     })
+
     return (
+        <div>
         <table>
             <thead>
             <th>ID</th>
@@ -37,6 +40,9 @@ const Servers = () => {
             })}
             </tbody>
         </table>
+            <Buttons />
+    </div>
+
     )
 
 }
