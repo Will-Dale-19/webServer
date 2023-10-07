@@ -22,9 +22,6 @@ public class LoginRestController {
         String username = loginInformation[0].replaceAll("\"", "");
         String password = loginInformation[1].replaceAll("\"", "");
 
-        System.out.println("username: " + username);
-        System.out.println("password: " + password);
-
         if (!accounts.isValidAccount(username, password)){
             throw new BadRequestException("invalid login information");
         } else {
