@@ -11,18 +11,16 @@ import org.springframework.web.bind.annotation.*;
         method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST}
 )
 public class LoginRestController {
-    private Accounts accounts = new Accounts();
+    private final Accounts accounts = new Accounts();
 
     // setting default test username/password
     @GetMapping
     @CrossOrigin()
     public String getLoginToken(@RequestBody String jsonLoginInformation){
-        System.out.println("JSON " + jsonLoginInformation);
-
         String[] loginInformation = parseLoginJson(jsonLoginInformation);
 
-        String username = loginInformation[0];
-        String password = loginInformation[1];
+        String username = loginInformation[0].replaceAll("\"", "");
+        String password = loginInformation[1].replaceAll("\"", "");
 
         System.out.println("username: " + username);
         System.out.println("password: " + password);
@@ -31,7 +29,7 @@ public class LoginRestController {
             throw new BadRequestException("invalid login information");
         } else {
             // TODO give an actual token
-            return "token: aValidToken";
+            return "{\"token\": \"test123\"}";
         }
     }
 
