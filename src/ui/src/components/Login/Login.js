@@ -9,7 +9,19 @@ async function loginUser(credentials) {
         },
         body: JSON.stringify(credentials)
     })
+        .then(checkError)
         .then(data => data.json())
+}
+
+const checkError = (response) => {
+    if(response.status !== 200){
+        showApiError();
+    }
+    return response;
+}
+
+function showApiError() {
+    throw new Error("Api Error");
 }
 
 function Login({setToken}) {
@@ -18,12 +30,16 @@ function Login({setToken}) {
 
     const handleSubmit = async e => {
         e.preventDefault();
-        const token = await loginUser({
-            username,
-            password
-        });
-        console.log("token" , token);
-        setToken(token);
+        try {
+            const token = await loginUser({
+                username,
+                password
+            });
+            setToken(token);
+        }
+        catch(ex){
+            alert("invalid login")
+        }
     }
 
     return(
