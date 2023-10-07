@@ -26,8 +26,7 @@ const Home = () => {
         <li><Link to={'/servers'}>Servers</Link></li>
       </ul>
         <div>
-            <h3>Logout</h3>
-            <button type="submit" onClick={logout}>logout</button>
+            <button type="submit" onClick={logout}>Logout</button>
         </div>
     </>
   )
