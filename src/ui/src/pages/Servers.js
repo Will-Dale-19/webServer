@@ -1,11 +1,13 @@
 import React, { useLayoutEffect, useState } from 'react'
 import Buttons from "../components/Buttons";
+import useToken from "../components/useToken";
 
 const Servers = () => {
     const [servers, setServers] = useState([])
+    const token = useToken().token;
 
-    useLayoutEffect(()=> {
-        const getServers = async() => {
+    useLayoutEffect(() => {
+        const getServers = async () => {
             const res = await fetch('/api/servers');
             const servers = await res.json();
             setServers(servers);
@@ -15,35 +17,39 @@ const Servers = () => {
         })
     })
 
-    return (
-        <div>
-        <table>
-            <thead>
-            <th>ID</th>
-            <th>Server Name</th>
-            <th>Server Location</th>
-            </thead>
-            <tbody>
-            {servers.map(server => {
-                const {
-                    serverId,
-                    serverName,
-                    serverLocation
-                } = server;
-                return(
-                    <tr key={serverId}>
-                        <td>{serverId}</td>
-                        <td>{serverName}</td>
-                        <td>{serverLocation}</td>
-                    </tr>
-                )
-            })}
-            </tbody>
-        </table>
-            <Buttons />
-    </div>
+    if(token) {
+        return (
+            <div>
+                <table>
+                    <thead>
+                    <th>ID</th>
+                    <th>Server Name</th>
+                    <th>Server Location</th>
+                    </thead>
+                    <tbody>
+                    {servers.map(server => {
+                        const {
+                            serverId,
+                            serverName,
+                            serverLocation
+                        } = server;
+                        return (
+                            <tr key={serverId}>
+                                <td>{serverId}</td>
+                                <td>{serverName}</td>
+                                <td>{serverLocation}</td>
+                            </tr>
+                        )
+                    })}
+                    </tbody>
+                </table>
+                <Buttons/>
+            </div>
 
-    )
+        )
+    } else {
+        throw new Error("Unauthorized Access Error");
+    }
 
 }
 
