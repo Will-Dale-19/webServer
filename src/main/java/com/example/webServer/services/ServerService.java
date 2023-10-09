@@ -36,7 +36,7 @@ public class ServerService {
 
     public List<Server> getUserServers(String filterUser){
         List<Server>servers = new ArrayList<>();
-        Iterable<ServerEntity> entities = this.serverRepository.findAllServers();
+        Iterable<ServerEntity> entities = this.serverRepository.findAllUserServers(filterUser);
         entities.forEach(entity -> {
             servers.add(this.translateDbToWeb(entity));
         });

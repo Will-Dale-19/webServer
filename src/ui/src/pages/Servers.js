@@ -33,6 +33,10 @@ const Servers = () => {
     })
 
     if(token) {
+        // checking to see if we have an admin token, if so get all servers.
+        let serversToGet
+        token === "admin" ? serversToGet = servers : serversToGet = userServers;
+
         return (
             <div>
                 <table>
@@ -42,7 +46,7 @@ const Servers = () => {
                     <th>Server Location</th>
                     </thead>
                     <tbody>
-                    {servers.map(server => {
+                    {serversToGet.map(server => {
                         const {
                             serverId,
                             serverName,
