@@ -23,7 +23,7 @@ function showApiError() {
     throw new Error("Api Error");
 }
 
-const CreateNewAccount = ({setToken}) => {
+function CreateNewAccount({setToken}) {
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
 
@@ -34,10 +34,13 @@ const CreateNewAccount = ({setToken}) => {
                 username,
                 password
             });
+            alert("Account Created");
             setToken(token);
+            goBackHome();
         }
         catch(ex){
-            alert("invalid login")
+            console.log(ex)
+            alert("Failed to create account")
         }
     }
 
@@ -54,7 +57,7 @@ const CreateNewAccount = ({setToken}) => {
                     <input type="password" onChange={e => setPassword(e.target.value)}/>
                 </label>
                 <div>
-                    <button type="submit" onClick={goBackHome}>Create Account</button>
+                    <button type="submit">Create Account</button>
                 </div>
             </form>
         </div>
@@ -62,7 +65,7 @@ const CreateNewAccount = ({setToken}) => {
 }
 
 function goBackHome(){
-    window.location.href="http://localhost:3000";
+    window.location.href = "http://localhost:3000";
 }
 
 export default CreateNewAccount;

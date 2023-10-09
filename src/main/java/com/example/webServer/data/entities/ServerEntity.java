@@ -17,5 +17,7 @@ public class ServerEntity {
 
     private String serverLocation;
 
+    private String owner;
+
 
 }

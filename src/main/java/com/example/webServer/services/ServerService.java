@@ -34,6 +34,16 @@ public class ServerService {
         return servers;
     }
 
+    public List<Server> getUserServers(String filterUser){
+        List<Server>servers = new ArrayList<>();
+        Iterable<ServerEntity> entities = this.serverRepository.findAllServers();
+        entities.forEach(entity -> {
+            servers.add(this.translateDbToWeb(entity));
+        });
+
+        return servers;
+    }
+
     public Server getServer(long id){
         Optional<ServerEntity> optional = this.serverRepository.findById(id);
         if(optional.isEmpty()){

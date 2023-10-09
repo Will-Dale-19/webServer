@@ -24,7 +24,23 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
             ServerEntity entity = new ServerEntity();
-            entity.setId(getServerId(file));
+            entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+            entity.setServerName(file.getName());
+            entity.setServerLocation(file.getAbsolutePath());
+            entities.add(entity);
+        }
+        return entities;
+    }
+
+    @Override
+    public List<ServerEntity> findAllUserServers(String username){
+        File serverLocation = new File("testData/servers");
+        File[] servers = serverLocation.listFiles();
+        List<ServerEntity> entities = new ArrayList<>();
+        for(File file : servers){
+            ServerEntity entity = new ServerEntity();
+            entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+            entity.setOwner(getServerInfo(file).get(1).get(1));
             entity.setServerName(file.getName());
             entity.setServerLocation(file.getAbsolutePath());
             entities.add(entity);
@@ -37,7 +53,7 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
      * @param file The server directory.
      * @return The ID of the server.
      */
-    private Long getServerId(File file) {
+    private List<List<String>> getServerInfo(File file) {
         File[] files = file.listFiles();
         List<List<String>> records = new ArrayList<>();
 
@@ -57,6 +73,6 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
                 }
             }
         }
-        return Long.parseLong(records.get(1).get(0));
+        return records;
     }
 }
