@@ -4,6 +4,7 @@ import useToken from "../components/useToken";
 
 const Servers = () => {
     const [servers, setServers] = useState([])
+    const [userServers, setUserServers] = useState([])
     const token = useToken().token;
 
     useLayoutEffect(() => {
@@ -13,7 +14,21 @@ const Servers = () => {
             setServers(servers);
         }
         getServers().catch(e => {
-            console.log('error fetching customers: ' + e);
+            console.log('error fetching servers: ' + e);
+        })
+    })
+
+    useLayoutEffect(() => {
+        const getServers = async () => {
+            const res = await fetch('/api/servers/getUserServers', {
+                method: 'POST',
+                body: JSON.stringify(token)
+            });
+            const userServers = await res.json();
+            setUserServers(userServers);
+        }
+        getServers().catch(e => {
+            console.log('error fetching user servers: ' + e);
         })
     })
 

@@ -38,12 +38,14 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
-            ServerEntity entity = new ServerEntity();
-            entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
-            entity.setOwner(getServerInfo(file).get(1).get(1));
-            entity.setServerName(file.getName());
-            entity.setServerLocation(file.getAbsolutePath());
-            entities.add(entity);
+            if(username.equals(getServerInfo(file).get(1).get(1))) {
+                ServerEntity entity = new ServerEntity();
+                entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+                entity.setOwner(getServerInfo(file).get(1).get(1));
+                entity.setServerName(file.getName());
+                entity.setServerLocation(file.getAbsolutePath());
+                entities.add(entity);
+            }
         }
         return entities;
     }
