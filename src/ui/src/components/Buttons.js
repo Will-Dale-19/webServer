@@ -73,10 +73,6 @@ function ToggleGroup() {
     );
 }
 
-function clickMe() {
-    alert("You clicked me!");
-}
-
 function changeServerStatus(type) {
     alert(type)
 }
@@ -84,7 +80,6 @@ function changeServerStatus(type) {
 const Buttons = () => {
     return (
         <div>
-            <div><Button onClick={clickMe}>Button</Button></div>
             <div><ToggleGroup /></div>
         </div>
     )

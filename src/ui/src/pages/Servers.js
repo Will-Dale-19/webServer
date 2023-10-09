@@ -41,9 +41,11 @@ const Servers = () => {
             <div>
                 <table>
                     <thead>
-                    <th>ID</th>
-                    <th>Server Name</th>
-                    <th>Server Location</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Server Name</th>
+                        <th>Server Location</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {serversToGet.map(server => {
@@ -53,16 +55,18 @@ const Servers = () => {
                             serverLocation
                         } = server;
                         return (
+                            <div>
                             <tr key={serverId}>
                                 <td>{serverId}</td>
                                 <td>{serverName}</td>
                                 <td>{serverLocation}</td>
                             </tr>
+                                <Buttons/>
+                            </div>
                         )
                     })}
                     </tbody>
                 </table>
-                <Buttons/>
             </div>
 
         )
