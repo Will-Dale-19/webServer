@@ -49,7 +49,7 @@ function ToggleGroup() {
     const [active, setActive] = useState(types[0]);
 
     return (
-        <div>
+        <ul>
             {types.map((type) => (
                 // This makes it so that if you click "start server",
                 // the active type is set to "stop server" to reflect
@@ -69,7 +69,7 @@ function ToggleGroup() {
                     {type}
                 </ButtonToggle>
             ))}
-        </div>
+        </ul>
     );
 }
 
@@ -79,9 +79,7 @@ function changeServerStatus(type) {
 
 const Buttons = () => {
     return (
-        <div>
-            <div><ToggleGroup /></div>
-        </div>
+        <ToggleGroup />
     )
 }
 export default Buttons

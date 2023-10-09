@@ -55,14 +55,12 @@ const Servers = () => {
                             serverLocation
                         } = server;
                         return (
-                            <div>
                             <tr key={serverId}>
                                 <td>{serverId}</td>
                                 <td>{serverName}</td>
                                 <td>{serverLocation}</td>
+                                <td><Buttons/></td>
                             </tr>
-                                <Buttons/>
-                            </div>
                         )
                     })}
                     </tbody>

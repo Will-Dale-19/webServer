@@ -34,7 +34,6 @@ public class ServerRestController {
         return this.serverService.getUserServers(username);
     }
 
-    // setting default test username/password
     @GetMapping("/login")
     @CrossOrigin()
     public String getLoginToken(@RequestBody String jsonLoginInformation){
