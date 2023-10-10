@@ -4,6 +4,7 @@ import com.example.webServer.data.repositories.Accounts;
 import com.example.webServer.services.ServerService;
 import com.example.webServer.web.errors.BadRequestException;
 import com.example.webServer.web.models.Server;
+import org.apache.tomcat.util.net.jsse.JSSEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,12 @@ public class ServerRestController {
     public List<Server> getUserServers(@RequestBody String json){
         String username = json.replaceAll("\"", "");
         return this.serverService.getUserServers(username);
+    }
+
+    @GetMapping("/servers/sendServerStatusUpdate")
+    public String updateServerStatus(@RequestBody String json){
+        System.out.println("testing API" + json);
+        return "{\"status\": \"" + "TESTING" + "\"}";
     }
 
     @GetMapping("/login")
@@ -69,7 +76,6 @@ public class ServerRestController {
         }
 
     }
-
 
     private String[] parseLoginJson(String jsonObj){
         String[] loginInformation = jsonObj.split(",");
