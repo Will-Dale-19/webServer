@@ -1,0 +1,9 @@
+
+C:\Users\offic\IdeaProjects\webServer\testData\servers\mockServer>java -Xmx1028M -Xms1028M -jar server.jar 
+Error: Unable to access jarfile server.jar
+
+C:\Users\offic\IdeaProjects\webServer\testData\servers\mockServer>java -Xmx1028M -Xms1028M -jar server.jar 
+Error: Unable to access jarfile server.jar
+
+C:\Users\offic\IdeaProjects\webServer\testData\servers\mockServer>java -Xmx1028M -Xms1028M -jar server.jar 
+Error: Unable to access jarfile server.jar

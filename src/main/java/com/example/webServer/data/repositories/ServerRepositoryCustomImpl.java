@@ -16,10 +16,10 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
      * CRUD override to get all servers.
      * @return A list of all server entities that are stored at the given location.
      */
+    // TODO Change from test data
+    private final File serverLocation = new File("./testData/servers");
     @Override
     public List<ServerEntity> findAllServers() {
-        // TODO Change from test data
-        File serverLocation = new File("C:\\servers");
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
@@ -37,10 +37,47 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
     }
 
     @Override
+    public List<ServerEntity> findAllUserServers(String username) {
     public List<ServerEntity> findAllUserServers(String username){
         File serverLocation = new File("C:\\servers");
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
+        for (File file : servers) {
+            try {
+                if (username.equals(getServerInfo(file).get(1).get(1))) {
+                    ServerEntity entity = createServerEntity(file);
+                    entities.add(entity);
+                }
+            } catch (IllegalStateException e) {
+                System.out.println(file + " has no information file!");
+            }
+        }
+        return entities;
+    }
+
+    @Override
+    public ServerEntity getServerByName(String serverName){
+        File[] servers = serverLocation.listFiles();
+        for(File file : servers){
+            if(file.getName().equals(serverName)) {
+                return createServerEntity(file);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new server entity from the given file
+     * @param file the file/directory of the server
+     * @return A new server entity.
+     */
+    private ServerEntity createServerEntity(File file){
+        ServerEntity entity = new ServerEntity();
+        entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+        entity.setOwner(getServerInfo(file).get(1).get(1));
+        entity.setServerName(file.getName());
+        entity.setServerLocation(file.getAbsolutePath());
+        return entity;
         for(File file : servers){
             try {
                 if (username.equals(getServerInfo(file).get(1).get(1))) {
