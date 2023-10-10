@@ -45,7 +45,7 @@ const ButtonToggle = styled(Button)`
 
 const types = ["Start Server", "Stop Server"];
 
-function ToggleGroup() {
+function ToggleGroup({server}) {
     const [active, setActive] = useState(types[0]);
 
     return (
@@ -61,7 +61,8 @@ function ToggleGroup() {
                     }
                     onClick={()=> {
                         type === types[0] ? setActive(types[1]) : setActive(types[0]);
-                        changeServerStatus(type)
+                        const data = sendServerUpdate(type, server)
+                        console.log(data)
                         }
                     }
                     disabled = { active !== type}
@@ -73,13 +74,29 @@ function ToggleGroup() {
     );
 }
 
-function changeServerStatus(type) {
-    alert(type)
+async function sendServerUpdate(type, serverName) {
+    return fetch(`http://localhost:8080/api/servers/sendServerStatusUpdate`, {
+        method: 'POST',
+        body: JSON.stringify({"type":type, "serverName":serverName})
+    })
+        .then(checkError)
+        .then(data => data.json())
 }
 
-const Buttons = () => {
+const checkError = (response) => {
+    if(response.status !== 200){
+        showApiError();
+    }
+    return response;
+}
+
+function showApiError() {
+    throw new Error("Api Error");
+}
+
+const Buttons = ({server}) => {
     return (
-        <ToggleGroup />
+        <ToggleGroup server={server}/>
     )
 }
 export default Buttons

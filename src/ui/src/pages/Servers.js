@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, {useLayoutEffect, useState} from 'react'
 import Buttons from "../components/Buttons";
 import useToken from "../components/useToken";
 
@@ -59,7 +59,7 @@ const Servers = () => {
                                 <td>{serverId}</td>
                                 <td>{serverName}</td>
                                 <td>{serverLocation}</td>
-                                <td><Buttons/></td>
+                                <td><Buttons server={serverName}/></td>
                             </tr>
                         )
                     })}
@@ -71,7 +71,6 @@ const Servers = () => {
     } else {
         throw new Error("Unauthorized Access Error");
     }
-
 }
 
 export default Servers
