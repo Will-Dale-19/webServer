@@ -44,6 +44,10 @@ public class ServerService {
         return servers;
     }
 
+    public ServerEntity getServerByName(String serverName){
+        return this.serverRepository.getServerByName(serverName);
+    }
+
     public Server getServer(long id){
         Optional<ServerEntity> optional = this.serverRepository.findById(id);
         if(optional.isEmpty()){

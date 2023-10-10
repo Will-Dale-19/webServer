@@ -10,4 +10,6 @@ public interface ServerRepositoryCustom {
 
     List<ServerEntity> findAllUserServers(String username);
 
+    ServerEntity getServerByName(String serverName);
+
 }

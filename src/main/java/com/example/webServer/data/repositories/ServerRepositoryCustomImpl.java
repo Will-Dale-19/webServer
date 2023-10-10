@@ -39,15 +39,37 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
             if(username.equals(getServerInfo(file).get(1).get(1))) {
-                ServerEntity entity = new ServerEntity();
-                entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
-                entity.setOwner(getServerInfo(file).get(1).get(1));
-                entity.setServerName(file.getName());
-                entity.setServerLocation(file.getAbsolutePath());
+                ServerEntity entity = createServerEntity(file);
                 entities.add(entity);
             }
         }
         return entities;
+    }
+
+    @Override
+    public ServerEntity getServerByName(String serverName){
+        File serverLocation = new File("testData/servers");
+        File[] servers = serverLocation.listFiles();
+        for(File file : servers){
+            if(file.getName().equals(serverName)) {
+                return createServerEntity(file);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new server entity from the given file
+     * @param file the file/directory of the server
+     * @return A new server entity.
+     */
+    private ServerEntity createServerEntity(File file){
+        ServerEntity entity = new ServerEntity();
+        entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+        entity.setOwner(getServerInfo(file).get(1).get(1));
+        entity.setServerName(file.getName());
+        entity.setServerLocation(file.getAbsolutePath());
+        return entity;
     }
 
     /**
