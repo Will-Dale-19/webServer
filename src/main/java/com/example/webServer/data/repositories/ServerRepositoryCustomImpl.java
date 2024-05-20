@@ -19,28 +19,36 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
     @Override
     public List<ServerEntity> findAllServers() {
         // TODO Change from test data
-        File serverLocation = new File("testData/servers");
+        File serverLocation = new File("C:\\servers");
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
-            ServerEntity entity = new ServerEntity();
-            entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
-            entity.setServerName(file.getName());
-            entity.setServerLocation(file.getAbsolutePath());
-            entities.add(entity);
+            try {
+                ServerEntity entity = new ServerEntity();
+                entity.setId(Long.parseLong(getServerInfo(file).get(1).get(0)));
+                entity.setServerName(file.getName());
+                entity.setServerLocation(file.getAbsolutePath());
+                entities.add(entity);
+            } catch (IllegalStateException e){
+                // TODO properly catch
+            }
         }
         return entities;
     }
 
     @Override
     public List<ServerEntity> findAllUserServers(String username){
-        File serverLocation = new File("testData/servers");
+        File serverLocation = new File("C:\\servers");
         File[] servers = serverLocation.listFiles();
         List<ServerEntity> entities = new ArrayList<>();
         for(File file : servers){
-            if(username.equals(getServerInfo(file).get(1).get(1))) {
-                ServerEntity entity = createServerEntity(file);
-                entities.add(entity);
+            try {
+                if (username.equals(getServerInfo(file).get(1).get(1))) {
+                    ServerEntity entity = createServerEntity(file);
+                    entities.add(entity);
+                }
+            } catch (IllegalStateException e){
+                System.out.println(file + " has no information file!");
             }
         }
         return entities;
@@ -48,7 +56,7 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
 
     @Override
     public ServerEntity getServerByName(String serverName){
-        File serverLocation = new File("testData/servers");
+        File serverLocation = new File("C:\\servers");
         File[] servers = serverLocation.listFiles();
         for(File file : servers){
             if(file.getName().equals(serverName)) {
@@ -96,6 +104,9 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
                     throw new RuntimeException(e); // TODO fix with better error
                 }
             }
+        }
+        if (records.size() < 1){
+            throw new IllegalStateException("Server does not have an information file.");
         }
         return records;
     }

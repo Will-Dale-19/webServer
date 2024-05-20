@@ -49,6 +49,7 @@ public class ServerRestController {
 
         if(type.equals("Start Server")){
             runningProcesses.put(serverName, sp.startServer());
+
             return "{\"status\": \"" + "STARTING" + "\"}";
         } else if (type.equals("Stop Server")){
             sp.stopServer(runningProcesses.get(serverName));
