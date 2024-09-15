@@ -1,14 +1,14 @@
 package com.example.webServer.web.rest;
 
+import com.example.webServer.ServerProcess;
+import com.example.webServer.data.entities.ServerEntity;
 import com.example.webServer.data.repositories.Accounts;
 import com.example.webServer.services.ServerService;
 import com.example.webServer.web.errors.BadRequestException;
 import com.example.webServer.web.models.Server;
-import org.apache.tomcat.util.net.jsse.JSSEUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -17,6 +17,7 @@ import java.util.List;
         method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST}
 )
 public class ServerRestController {
+    private final HashMap<String, Process> runningProcesses = new HashMap<>();
     private final ServerService serverService;
     private final Accounts accounts = new Accounts();
 
@@ -38,7 +39,25 @@ public class ServerRestController {
     @GetMapping("/servers/sendServerStatusUpdate")
     public String updateServerStatus(@RequestBody String json){
         System.out.println("testing API" + json);
-        return "{\"status\": \"" + "TESTING" + "\"}";
+        String[] statusInformation = parseLoginJson(json);
+
+        String type = statusInformation[0].replaceAll("\"", "");
+        String serverName = statusInformation[1].replaceAll("\"", "");
+        ServerEntity serverEntity = serverService.getServerByName(serverName);
+
+        ServerProcess sp = new ServerProcess(serverEntity.getServerLocation());
+
+        if(type.equals("Start Server")){
+            runningProcesses.put(serverName, sp.startServer());
+
+            return "{\"status\": \"" + "STARTING" + "\"}";
+        } else if (type.equals("Stop Server")){
+            sp.stopServer(runningProcesses.get(serverName));
+            runningProcesses.remove(serverName);
+            return "{\"status\": \"" + "STOPPING" + "\"}";
+        } else {
+            throw new BadRequestException("Unknown command to run");
+        }
     }
 
     @GetMapping("/login")
