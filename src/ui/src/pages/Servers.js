@@ -1,42 +1,31 @@
-import React, {useLayoutEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import Buttons from "../components/Buttons";
 import useToken from "../components/useToken";
 
 const Servers = () => {
     const [servers, setServers] = useState([])
-    const [userServers, setUserServers] = useState([])
     const token = useToken().token;
 
-    useLayoutEffect(() => {
+    useEffect(() => {
+        let route = ''
+        token === "admin" ? route = '/api/servers' : route = '/api/servers/getUserServers';
         const getServers = async () => {
-            const res = await fetch('/api/servers');
-            const servers = await res.json();
-            setServers(servers);
+                const res = await fetch(route);
+                const servers = await res.json();
+                if (!fetching) {
+                    setServers(servers);
+                }
         }
+        let fetching = false
         getServers().catch(e => {
             console.log('error fetching servers: ' + e);
         })
-    })
-
-    useLayoutEffect(() => {
-        const getServers = async () => {
-            const res = await fetch('/api/servers/getUserServers', {
-                method: 'POST',
-                body: JSON.stringify(token)
-            });
-            const userServers = await res.json();
-            setUserServers(userServers);
+        return () => {
+            fetching = true
         }
-        getServers().catch(e => {
-            console.log('error fetching user servers: ' + e);
-        })
-    })
+    },[token])
 
     if(token) {
-        // checking to see if we have an admin token, if so get all servers.
-        let serversToGet
-        token === "admin" ? serversToGet = servers : serversToGet = userServers;
-
         return (
             <div>
                 <table>
@@ -48,7 +37,7 @@ const Servers = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {serversToGet.map(server => {
+                    {servers.map(server => {
                         const {
                             serverId,
                             serverName,
