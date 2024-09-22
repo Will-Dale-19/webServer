@@ -37,21 +37,7 @@ const Servers = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {servers.map(server => {
-                        const {
-                            serverId,
-                            serverName,
-                            serverLocation
-                        } = server;
-                        return (
-                            <tr key={serverId}>
-                                <td>{serverId}</td>
-                                <td>{serverName}</td>
-                                <td>{serverLocation}</td>
-                                <td><Buttons server={serverName}/></td>
-                            </tr>
-                        )
-                    })}
+                    {servers.isArray ? MapServers(servers) : <p> </p>}
                     </tbody>
                 </table>
             </div>
@@ -59,6 +45,23 @@ const Servers = () => {
         )
     } else {
         throw new Error("Unauthorized Access Error");
+    }
+    function MapServers(servers){
+        servers.map(server => {
+            const {
+                serverId,
+                serverName,
+                serverLocation
+            } = server;
+            return (
+                <tr key={serverId}>
+                    <td>{serverId}</td>
+                    <td>{serverName}</td>
+                    <td>{serverLocation}</td>
+                    <td><Buttons server={serverName}/></td>
+                </tr>
+            )
+        })
     }
 }
 
