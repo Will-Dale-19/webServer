@@ -6,6 +6,10 @@ import java.util.List;
 
 public interface ServerRepositoryCustom {
 
-    public List<ServerEntity> findAllServers();
+    List<ServerEntity> findAllServers();
+
+    List<ServerEntity> findAllUserServers(String username);
+
+    ServerEntity getServerByName(String serverName);
 
 }

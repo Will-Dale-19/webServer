@@ -1,44 +1,65 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
+import Buttons from "../components/Buttons";
+import useToken from "../components/useToken";
 
 const Servers = () => {
     const [servers, setServers] = useState([])
+    const token = useToken().token;
 
-    useLayoutEffect(()=> {
-        const getServers = async() => {
-            const res = await fetch('/api/servers');
-            const servers = await res.json();
-            setServers(servers);
+    useEffect(() => {
+        let route = ''
+        token === "admin" ? route = '/api/servers' : route = '/api/servers/getUserServers';
+        const getServers = async () => {
+                const res = await fetch(route);
+                const servers = await res.json();
+                if (!fetching) {
+                    setServers(servers);
+                }
         }
+        let fetching = false
         getServers().catch(e => {
-            console.log('error fetching customers: ' + e);
+            console.log('error fetching servers: ' + e);
         })
-    })
-    return (
-        <table>
-            <thead>
-            <th>ID</th>
-            <th>Server Name</th>
-            <th>Server Location</th>
-            </thead>
-            <tbody>
-            {servers.map(server => {
-                const {
-                    serverId,
-                    serverName,
-                    serverLocation
-                } = server;
-                return(
-                    <tr key={serverId}>
-                        <td>{serverId}</td>
-                        <td>{serverName}</td>
-                        <td>{serverLocation}</td>
-                    </tr>
-                )
-            })}
-            </tbody>
-        </table>
-    )
+        return () => {
+            fetching = true
+        }
+    },[token])
 
+    if(token) {
+        return (
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Server Name</th>
+                        <th>Server Location</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {servers.map(server => {
+                        const {
+                            serverId,
+                            serverName,
+                            serverLocation
+                        } = server;
+                        return (
+                            <tr key={serverId}>
+                                <td>{serverId}</td>
+                                <td>{serverName}</td>
+                                <td>{serverLocation}</td>
+                                <td><Buttons server={serverName}/></td>
+                            </tr>
+                        )
+                    })}
+                    </tbody>
+                </table>
+            </div>
+
+        )
+    } else {
+        throw new Error("Unauthorized Access Error");
+    }
 }
 
 export default Servers

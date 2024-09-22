@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<frontend.src.directory>src/ui</frontend.src.directory>
-		<node.version>v18.15.0</node.version>
+		<node.version>v18.18.0</node.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,6 +46,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>6.0.12</version>
 		</dependency>
 	</dependencies>
 
