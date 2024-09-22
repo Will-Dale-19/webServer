@@ -1,20 +1,25 @@
+import './Servers.css'
 import React, {useEffect, useState} from 'react'
 import Buttons from "../components/Buttons";
 import useToken from "../components/useToken";
 
 const Servers = () => {
-    const [servers, setServers] = useState([])
+    const [servers, setServers] = useState(null)
     const token = useToken().token;
 
     useEffect(() => {
         let route = ''
         token === "admin" ? route = '/api/servers' : route = '/api/servers/getUserServers';
         const getServers = async () => {
-                const res = await fetch(route);
-                const servers = await res.json();
-                if (!fetching) {
-                    setServers(servers);
-                }
+            const res = token === "admin" ? await fetch(route) : await fetch(route, {
+                method: 'POST',
+                body: JSON.stringify(token)
+            })
+
+            const servers = await res.json();
+            if (!fetching) {
+                setServers(servers);
+            }
         }
         let fetching = false
         getServers().catch(e => {
@@ -28,38 +33,43 @@ const Servers = () => {
     if(token) {
         return (
             <div>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Server Name</th>
-                        <th>Server Location</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {servers.isArray ? MapServers(servers) : <p> </p>}
-                    </tbody>
-                </table>
+                <div>
+                <ul>
+                    <li>ID</li>
+                    <li>Server Name</li>
+                    <li>Server Location</li>
+                </ul>
+                </div>
+                <div>
+                {MapServers(servers)}
+                </div>
             </div>
 
         )
     } else {
         throw new Error("Unauthorized Access Error");
     }
-    function MapServers(servers){
-        servers.map(server => {
+    function MapServers(servers) {
+        if (!servers){
+            return (
+                <p>Loading...</p>
+            )
+        }
+        return servers.map(server => {
             const {
                 serverId,
                 serverName,
                 serverLocation
             } = server;
             return (
-                <tr key={serverId}>
-                    <td>{serverId}</td>
-                    <td>{serverName}</td>
-                    <td>{serverLocation}</td>
-                    <td><Buttons server={serverName}/></td>
-                </tr>
+                <div>
+                    <ul key={serverId}>
+                        <li>{serverId}</li>
+                        <li>{serverName}</li>
+                        <li>{serverLocation}</li>
+                        <li><Buttons server={serverName}/></li>
+                    </ul>
+                </div>
             )
         })
     }
