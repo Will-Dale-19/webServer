@@ -60,9 +60,17 @@ function ToggleGroup({server}) {
                         active === type
                     }
                     onClick={()=> {
-                        type === types[0] ? setActive(types[1]) : setActive(types[0]);
-                        const data = sendServerUpdate(type, server)
-                        console.log(data)
+                        const response = active === types[0]  ? sendStartServerRequest(server) : sendStopServerRequest(server)
+                        response.then((result) => {
+
+                            console.log(result.status)
+                            if (result.status !== "FAILED-TO-START"){
+                                type === types[0] ? setActive(types[1]) : setActive(types[0]);
+                            } else {
+                                alert("Server failed to start!");
+                            }
+                        })
+
                         }
                     }
                     disabled = { active !== type}
@@ -78,6 +86,25 @@ async function sendServerUpdate(type, serverName) {
     return fetch(`http://localhost:8080/api/servers/sendServerStatusUpdate`, {
         method: 'POST',
         body: JSON.stringify({"type":type, "serverName":serverName})
+    })
+        .then(checkError)
+        .then(data => data.json())
+}
+async function sendStartServerRequest(serverName) {
+
+    return fetch(`http://localhost:8080/api/servers/startServer`, {
+        method: 'POST',
+        body: JSON.stringify(serverName)
+    })
+        .then(checkError)
+        .then(data => data.json())
+}
+
+async function sendStopServerRequest(serverName) {
+
+    return fetch(`http://localhost:8080/api/servers/stopServer`, {
+        method: 'POST',
+        body: JSON.stringify(serverName)
     })
         .then(checkError)
         .then(data => data.json())
