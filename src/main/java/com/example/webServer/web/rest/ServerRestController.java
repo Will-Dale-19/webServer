@@ -8,7 +8,6 @@ import com.example.webServer.web.errors.BadRequestException;
 import com.example.webServer.web.models.Server;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,19 +28,39 @@ public class ServerRestController {
 
     @GetMapping("/servers")
     public List<Server> getAll(@RequestParam(name="serverName", required = false)String serverName){
-        return this.serverService.getAlLServers(serverName);
+        List<Server> servers = this.serverService.getAlLServers(serverName);
+        for (Server server : servers){
+            server.setServerStatus(runningProcesses.containsKey(server.serverName));
+        }
+
+        return servers;
     }
 
     @GetMapping("/servers/getUserServers")
     public List<Server> getUserServers(@RequestBody String json){
         String username = json.replaceAll("\"", "");
-        return this.serverService.getUserServers(username);
+        List<Server> servers = this.serverService.getUserServers(username);
+        for (Server server : servers){
+            server.setServerStatus(runningProcesses.containsKey(server.serverName));
+        }
+
+        return servers;
+    }
+
+
+    @GetMapping("/servers/getServerStatus/{serverName}")
+    public String getServerStatus(@PathVariable(name = "serverName") String serverName){
+        serverName = serverName.replaceAll("\"", "");
+
+        System.out.println("Getting status of: " + serverName + " it is: " + runningProcesses.containsKey(serverName));
+        return "{\"serverStatus\": \"" +runningProcesses.containsKey(serverName)+"\"}";
+
     }
 
     @PostMapping("/servers/startServer")
-    public String updateServerStatus(@RequestBody String serverName){
+    public String startServer(@RequestBody String serverName){
         serverName = serverName.replaceAll("\"", "");
-        System.out.println("testing API" + serverName);
+        System.out.println("Starting: " + serverName);
 
         ServerEntity serverEntity = serverService.getServerByName(serverName.replaceAll("\"", ""));
 
@@ -75,6 +94,7 @@ public class ServerRestController {
     @PostMapping("/servers/stopServer")
     public String stopServer(@RequestBody String serverName){
         serverName = serverName.replaceAll("\"", "");
+        System.out.println("Stopping: " + serverName);
 
         ServerProcess serverProcess = runningProcesses.get(serverName);
         // more robust handling of the scenarios is needed.

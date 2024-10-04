@@ -33,34 +33,25 @@ Button.defaultProps = {
 };
 
 const ButtonToggle = styled(Button)`
-  opacity: 0.7;
+  opacity: 1.0;
   cursor: default;
-  ${({ active }) =>
-    active &&
-    `
-    cursor: pointer;
-    opacity: 1; 
-  `}
+
 `;
 
 const types = ["Start Server", "Stop Server"];
 
-function ToggleGroup({server}) {
-    const [active, setActive] = useState(types[0]);
+function ToggleGroup({server, serverStatus}) {
+
+    const [active, setActive] = useState(serverStatus ? types[1] : types[0]);
 
     return (
         <ul>
             {types.map((type) => (
-                // This makes it so that if you click "start server",
-                // the active type is set to "stop server" to reflect
-                // the server status.
+
                 <ButtonToggle
                     id = {"Button"+type}
-                    active={
-                        active === type
-                    }
                     onClick={()=> {
-                        const response = active === types[0]  ? sendStartServerRequest(server) : sendStopServerRequest(server)
+                        const response = active === types[0] ? sendStartServerRequest(server) : sendStopServerRequest(server)
                         response.then((result) => {
 
                             console.log(result.status)
@@ -82,14 +73,6 @@ function ToggleGroup({server}) {
     );
 }
 
-async function sendServerUpdate(type, serverName) {
-    return fetch(`http://localhost:8080/api/servers/sendServerStatusUpdate`, {
-        method: 'POST',
-        body: JSON.stringify({"type":type, "serverName":serverName})
-    })
-        .then(checkError)
-        .then(data => data.json())
-}
 async function sendStartServerRequest(serverName) {
 
     return fetch(`http://localhost:8080/api/servers/startServer`, {
@@ -99,6 +82,7 @@ async function sendStartServerRequest(serverName) {
         .then(checkError)
         .then(data => data.json())
 }
+
 
 async function sendStopServerRequest(serverName) {
 
@@ -121,9 +105,9 @@ function showApiError() {
     throw new Error("Api Error");
 }
 
-const Buttons = ({server}) => {
+const Buttons = ({server, serverStatus}) => {
     return (
-        <ToggleGroup server={server}/>
+        <ToggleGroup server={server} serverStatus={serverStatus}/>
     )
 }
 export default Buttons

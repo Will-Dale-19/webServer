@@ -3,8 +3,20 @@ import React, {useEffect, useState} from 'react'
 import Buttons from "../components/Buttons";
 import useToken from "../components/useToken";
 
+const checkError = (response) => {
+    if(response.status !== 200){
+        showApiError();
+    }
+    return response;
+}
+
+function showApiError() {
+    throw new Error("Api Error");
+}
+
 const Servers = () => {
     const [servers, setServers] = useState(null)
+
     const token = useToken().token;
 
     useEffect(() => {
@@ -49,6 +61,7 @@ const Servers = () => {
     } else {
         throw new Error("Unauthorized Access Error");
     }
+
     function MapServers(servers) {
         if (!servers){
             return (
@@ -59,7 +72,8 @@ const Servers = () => {
             const {
                 serverId,
                 serverName,
-                serverLocation
+                serverLocation,
+                serverStatus
             } = server;
             return (
                 <div>
@@ -67,7 +81,8 @@ const Servers = () => {
                         <li>{serverId}</li>
                         <li>{serverName}</li>
                         <li>{serverLocation}</li>
-                        <li><Buttons server={serverName}/></li>
+                        <li>{serverStatus}</li>
+                        <li><Buttons server={serverName} serverStatus={serverStatus}/></li>
                     </ul>
                 </div>
             )
