@@ -75,7 +75,7 @@ public class ServerService {
     }
 
     private Server translateDbToWeb(ServerEntity entity){
-        return new Server(entity.getId(), entity.getServerName(), entity.getServerLocation());
+        return new Server(entity.getId(), entity.getServerName(), entity.getServerLocation(), false);
     }
 
 }

@@ -1,10 +1,16 @@
 package com.example.webServer;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.*;
 
 public class ServerProcess {
-    ProcessBuilder pb;
-    String serverLocation;
+    private final String serverLocation;
+
+    @Getter
+    @Setter
+    private Process process;
 
     public ServerProcess(String serverLocation){
         this.serverLocation = serverLocation;
@@ -12,49 +18,47 @@ public class ServerProcess {
 
     /**
      * Starts the server
-     * @return returns the started server process instance.
      */
-    public Process startServer(){
-        pb = new ProcessBuilder(serverLocation + "\\start.bat");
+    public void startServer() throws RuntimeException {
+
+        ProcessBuilder pb = new ProcessBuilder(serverLocation + "\\start.bat");
+
         pb.directory(new File(serverLocation));
         File log = new File(serverLocation + "\\log");
         pb.redirectErrorStream(true);
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(log));
         try {
             Process p = pb.start();
+            this.process = p;
             System.out.println("PID: " + p.pid());
             assert pb.redirectOutput().file() == log;
             //p.waitFor();
-            return p;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }/* catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        */
+        throw new RuntimeException(e);
+    }
+    */
     }
 
     /**
      * Stop the server, ideally with the /stop command to ensure a safe shutdown.
-     * @param p the process that is to be shutdown
      */
     public void stopServer(Process p){
-        p.destroy();
+        System.out.println("stopping server...");
 
-        /*
-        OutputStream stdin = p.getOutputStream();
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()))) {
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
-
-        try {
             writer.write("/stop");
 
             writer.flush();
 
-        } catch (IOException e) {
+            p.destroy();
+        }  catch (IOException e) {
             throw new RuntimeException(e);
         }
-        */
+
+
 
     }
 

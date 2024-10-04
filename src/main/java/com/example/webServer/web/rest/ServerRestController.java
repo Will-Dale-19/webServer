@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(
@@ -17,7 +18,7 @@ import java.util.List;
         method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST}
 )
 public class ServerRestController {
-    private final HashMap<String, Process> runningProcesses = new HashMap<>();
+    private final HashMap<String, ServerProcess> runningProcesses = new HashMap<>();
     private final ServerService serverService;
     private final Accounts accounts = new Accounts();
 
@@ -27,36 +28,82 @@ public class ServerRestController {
 
     @GetMapping("/servers")
     public List<Server> getAll(@RequestParam(name="serverName", required = false)String serverName){
-        return this.serverService.getAlLServers(serverName);
+        List<Server> servers = this.serverService.getAlLServers(serverName);
+        for (Server server : servers){
+            server.setServerStatus(runningProcesses.containsKey(server.serverName));
+        }
+
+        return servers;
     }
 
     @GetMapping("/servers/getUserServers")
     public List<Server> getUserServers(@RequestBody String json){
         String username = json.replaceAll("\"", "");
-        return this.serverService.getUserServers(username);
+        List<Server> servers = this.serverService.getUserServers(username);
+        for (Server server : servers){
+            server.setServerStatus(runningProcesses.containsKey(server.serverName));
+        }
+
+        return servers;
     }
 
-    @GetMapping("/servers/sendServerStatusUpdate")
-    public String updateServerStatus(@RequestBody String json){
-        System.out.println("testing API" + json);
-        String[] statusInformation = parseLoginJson(json);
 
-        String type = statusInformation[0].replaceAll("\"", "");
-        String serverName = statusInformation[1].replaceAll("\"", "");
-        ServerEntity serverEntity = serverService.getServerByName(serverName);
+    @GetMapping("/servers/getServerStatus/{serverName}")
+    public String getServerStatus(@PathVariable(name = "serverName") String serverName){
+        serverName = serverName.replaceAll("\"", "");
+
+        System.out.println("Getting status of: " + serverName + " it is: " + runningProcesses.containsKey(serverName));
+        return "{\"serverStatus\": \"" +runningProcesses.containsKey(serverName)+"\"}";
+
+    }
+
+    @PostMapping("/servers/startServer")
+    public String startServer(@RequestBody String serverName){
+        serverName = serverName.replaceAll("\"", "");
+        System.out.println("Starting: " + serverName);
+
+        ServerEntity serverEntity = serverService.getServerByName(serverName.replaceAll("\"", ""));
 
         ServerProcess sp = new ServerProcess(serverEntity.getServerLocation());
+        if (serverEntity.getServerLocation() == null) {
+            System.out.println("Missing server location for: " + serverName);
+            return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
+        }
+        try {
+            sp.startServer();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            System.out.println("Server start batch file is missing for: " + serverName);
+            return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
+        }
+        try {
+            Optional<ProcessHandle> processHandle = ProcessHandle.of(sp.getProcess().pid());
+            if (processHandle.isPresent() && processHandle.get().isAlive()) {
+                runningProcesses.put(serverName, sp);
+                return "{\"status\": \"" + "STARTING" + "\"}";
+            } else {
+                return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
+            }
+        } catch (NullPointerException e){
+            System.out.println("Server was unable to start: " + serverName);
+            e.printStackTrace();
+            return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
+        }
+    }
 
-        if(type.equals("Start Server")){
-            runningProcesses.put(serverName, sp.startServer());
+    @PostMapping("/servers/stopServer")
+    public String stopServer(@RequestBody String serverName){
+        serverName = serverName.replaceAll("\"", "");
+        System.out.println("Stopping: " + serverName);
 
-            return "{\"status\": \"" + "STARTING" + "\"}";
-        } else if (type.equals("Stop Server")){
-            sp.stopServer(runningProcesses.get(serverName));
+        ServerProcess serverProcess = runningProcesses.get(serverName);
+        // more robust handling of the scenarios is needed.
+        if (serverProcess != null) {
+            serverProcess.stopServer(serverProcess.getProcess());
             runningProcesses.remove(serverName);
             return "{\"status\": \"" + "STOPPING" + "\"}";
         } else {
-            throw new BadRequestException("Unknown command to run");
+            return "{\"status\": \"" + "FAILED-TO-STOP" + "\"}";
         }
     }
 

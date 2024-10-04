@@ -19,4 +19,6 @@ public class Server {
 
     public String serverLocation;
 
+    public Boolean serverStatus;
+
 }
