@@ -6,6 +6,8 @@ import com.example.webServer.data.repositories.Accounts;
 import com.example.webServer.services.ServerService;
 import com.example.webServer.web.errors.BadRequestException;
 import com.example.webServer.web.models.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import java.util.Optional;
         method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.POST}
 )
 public class ServerRestController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerRestController.class);
     private final HashMap<String, ServerProcess> runningProcesses = new HashMap<>();
     private final ServerService serverService;
     private final Accounts accounts = new Accounts();
@@ -29,6 +33,13 @@ public class ServerRestController {
     @GetMapping("/servers")
     public List<Server> getAll(@RequestParam(name="serverName", required = false)String serverName){
         List<Server> servers = this.serverService.getAlLServers(serverName);
+
+        if (serverName != null) {
+            LOGGER.info("An admin has requested a server: {}", serverName);
+        } else {
+            LOGGER.info("An admin has requested all servers");
+        }
+
         for (Server server : servers){
             server.setServerStatus(runningProcesses.containsKey(server.serverName));
         }
@@ -36,9 +47,12 @@ public class ServerRestController {
         return servers;
     }
 
-    @GetMapping("/servers/getUserServers")
+    @PostMapping("/servers/getUserServers")
     public List<Server> getUserServers(@RequestBody String json){
         String username = json.replaceAll("\"", "");
+
+        LOGGER.info("{} is requesting their servers.", username);
+
         List<Server> servers = this.serverService.getUserServers(username);
         for (Server server : servers){
             server.setServerStatus(runningProcesses.containsKey(server.serverName));
@@ -52,28 +66,29 @@ public class ServerRestController {
     public String getServerStatus(@PathVariable(name = "serverName") String serverName){
         serverName = serverName.replaceAll("\"", "");
 
-        System.out.println("Getting status of: " + serverName + " it is: " + runningProcesses.containsKey(serverName));
-        return "{\"serverStatus\": \"" +runningProcesses.containsKey(serverName)+"\"}";
+        LOGGER.info("Getting status of: {} it is: {}", serverName, runningProcesses.containsKey(serverName));
 
+        return "{\"serverStatus\": \"" +runningProcesses.containsKey(serverName)+"\"}";
     }
 
     @PostMapping("/servers/startServer")
     public String startServer(@RequestBody String serverName){
         serverName = serverName.replaceAll("\"", "");
-        System.out.println("Starting: " + serverName);
+
+        LOGGER.info("Attempting to start server: {}", serverName);
 
         ServerEntity serverEntity = serverService.getServerByName(serverName.replaceAll("\"", ""));
 
         ServerProcess sp = new ServerProcess(serverEntity.getServerLocation());
         if (serverEntity.getServerLocation() == null) {
-            System.out.println("Missing server location for: " + serverName);
+            LOGGER.error("Missing server location for: {}", serverName);
             return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
         }
         try {
             sp.startServer();
         } catch (RuntimeException e) {
             e.printStackTrace();
-            System.out.println("Server start batch file is missing for: " + serverName);
+            LOGGER.error("Server start batch file is missing for: {}", serverName);
             return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
         }
         try {
@@ -85,7 +100,7 @@ public class ServerRestController {
                 return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
             }
         } catch (NullPointerException e){
-            System.out.println("Server was unable to start: " + serverName);
+            LOGGER.error("Server was unable to start: {}", serverName);
             e.printStackTrace();
             return "{\"status\": \"" + "FAILED-TO-START" + "\"}";
         }
@@ -94,20 +109,23 @@ public class ServerRestController {
     @PostMapping("/servers/stopServer")
     public String stopServer(@RequestBody String serverName){
         serverName = serverName.replaceAll("\"", "");
-        System.out.println("Stopping: " + serverName);
+
+        LOGGER.info("Attempting to stop server: {}", serverName);
 
         ServerProcess serverProcess = runningProcesses.get(serverName);
         // more robust handling of the scenarios is needed.
         if (serverProcess != null) {
             serverProcess.stopServer(serverProcess.getProcess());
             runningProcesses.remove(serverName);
+            LOGGER.info("Server successfully stopped.");
             return "{\"status\": \"" + "STOPPING" + "\"}";
         } else {
+            LOGGER.error("Failed to stop server.");
             return "{\"status\": \"" + "FAILED-TO-STOP" + "\"}";
         }
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @CrossOrigin()
     public String getLoginToken(@RequestBody String jsonLoginInformation){
         String[] loginInformation = parseLoginJson(jsonLoginInformation);
@@ -115,10 +133,14 @@ public class ServerRestController {
         String username = loginInformation[0].replaceAll("\"", "");
         String password = loginInformation[1].replaceAll("\"", "");
 
+        LOGGER.info("Attempting to log in user: {}", username);
+
         if (!accounts.isValidAccount(username, password)){
+            LOGGER.info("Bad login attempt from: {}", username);
             throw new BadRequestException("invalid login information");
         } else {
             // TODO give an actual token
+            LOGGER.info("User successfully authorized: {}", username);
             return "{\"token\": \"" +username+"\"}";
         }
     }

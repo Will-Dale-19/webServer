@@ -2,10 +2,15 @@ package com.example.webServer;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 public class ServerProcess {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerProcess.class);
+
     private final String serverLocation;
 
     @Getter
@@ -30,23 +35,20 @@ public class ServerProcess {
         try {
             Process p = pb.start();
             this.process = p;
-            System.out.println("PID: " + p.pid());
+            LOGGER.info("Starting server with PID: {}", p.pid());
             assert pb.redirectOutput().file() == log;
             //p.waitFor();
         } catch (IOException e) {
+            LOGGER.error("Failed to start server.");
             throw new RuntimeException(e);
-        }/* catch (InterruptedException e) {
-        throw new RuntimeException(e);
-    }
-    */
+        }
     }
 
     /**
      * Stop the server, ideally with the /stop command to ensure a safe shutdown.
      */
     public void stopServer(Process p){
-        System.out.println("stopping server...");
-
+        LOGGER.info("Attempting to stop server with PID: {}", p.pid());
         try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()))) {
 
             writer.write("/stop");
@@ -55,6 +57,7 @@ public class ServerProcess {
 
             p.destroy();
         }  catch (IOException e) {
+            LOGGER.error("Failed to stop server with PID: {}", p.pid());
             throw new RuntimeException(e);
         }
 

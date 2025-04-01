@@ -1,3 +1,5 @@
+node_modules
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -31,4 +33,23 @@ target/
 ### VS Code ###
 .vscode/
 ### Other ###
-src/ui/node_modules/
+
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
