@@ -1,9 +1,14 @@
 package com.example.webServer.data.repositories;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.HashMap;
 
 public class Accounts {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Accounts.class);
 
     private final HashMap<String, String> records = new HashMap<>();
 
@@ -19,9 +24,10 @@ public class Accounts {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 records.put(values[0], values[1]);
-            }
+        }
         } catch (IOException e) {
-            throw new RuntimeException(e); // TODO fix with better error
+            LOGGER.error("Error occurred while attempting to load account data from database.");
+            throw new RuntimeException(e);
         }
 
     }
@@ -64,7 +70,7 @@ public class Accounts {
             out.println(username + "," + password);
 
         } catch (IOException e) {
-            System.out.println("failed to write to account file");
+            LOGGER.error("Failed to write account to database with username: {}", username);
         }
 
     }

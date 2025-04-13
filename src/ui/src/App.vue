@@ -4,6 +4,7 @@ import HelloWorld from './components/HelloWorld.vue'
 import CurrentUserDisplay from "@/components/CurrentUserDisplay.vue";
 import {useUserStore} from "@/stores/user.ts";
 
+
 const savedUserStr = sessionStorage.getItem('token');
 
 const store = useUserStore();
@@ -27,7 +28,6 @@ if (savedUserStr != null) {
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/login">Log In</RouterLink>
         <RouterLink to="/servers">View your servers</RouterLink>
       </nav>
     </div>

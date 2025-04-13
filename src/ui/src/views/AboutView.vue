@@ -1,12 +1,10 @@
 <template>
   <div>
-    <h1>Not much about this website.</h1>
+    <h3>Go to the "View your servers" tab to view any servers you can manage.</h3>
   </div>
 </template>
 
 <script setup lang="ts">
-
-import LoginComponent from "@/components/LoginComponent.vue";
 
 </script>
 

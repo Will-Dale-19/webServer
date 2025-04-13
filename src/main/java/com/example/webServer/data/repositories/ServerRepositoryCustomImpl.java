@@ -1,6 +1,8 @@
 package com.example.webServer.data.repositories;
 
 import com.example.webServer.data.entities.ServerEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerRepositoryCustomImpl.class);
 
     /**
      * CRUD override to get all servers.
@@ -47,7 +51,7 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
                     entities.add(entity);
                 }
             } catch (IllegalStateException e) {
-                System.out.println(file + " has no information file!");
+                LOGGER.error("{} has no information file!", file);
             }
         }
         return entities;
@@ -99,11 +103,13 @@ public class ServerRepositoryCustomImpl implements ServerRepositoryCustom {
                         records.add(Arrays.asList(values));
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException(e); // TODO fix with better error
+                    LOGGER.error("Failed to read server info file for: {}", file1);
+                    throw new RuntimeException(e);
                 }
             }
         }
-        if (records.size() < 1){
+        if (records.isEmpty()){
+            LOGGER.error("Server does not have an information file");
             throw new IllegalStateException("Server does not have an information file.");
         }
         return records;

@@ -13,6 +13,18 @@ export async function login(credentials : Object): Promise<any> {
         .then(data => data.json())
 }
 
+export async function createNewAccount(credentials: Object): Promise<any> {
+    return fetch(`http://localhost:8080/api/createAccount`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+    })
+        .then(checkError)
+        .then(data => data.json())
+}
+
 export async function getServers(): Promise<any> {
     return useUserStore().token === "admin" ? adminGetAll() : getUserServers(useUserStore().username)
         .then(checkError)

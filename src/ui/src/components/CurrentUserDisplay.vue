@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/user.ts";
 import {ref, watch} from "vue";
+import {RouterLink} from "vue-router";
 
 const store = useUserStore();
 
@@ -16,6 +17,10 @@ watch(() => store.username, () => {
 <template>
   <div v-if="userRef">
     <h3>Logged in: {{userRef}}</h3>
+    <RouterLink to="/login">Log out</RouterLink>
+  </div>
+  <div v-if="!userRef">
+    <RouterLink to="/login">Log In</RouterLink>
   </div>
 </template>
 

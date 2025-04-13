@@ -30,9 +30,20 @@ function changeButton() {
 </script>
 
 <template>
-<button @click="changeButton">{{serverStatusRef}}</button>
+<button class="button" @click="changeButton">{{serverStatusRef}}</button>
 </template>
 
 <style scoped>
+
+button {
+  padding: 7px;
+  border-style: groove;
+  border-color: gray;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: dimgray;
+}
 
 </style>

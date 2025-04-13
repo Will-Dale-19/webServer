@@ -145,15 +145,15 @@ public class ServerRestController {
         }
     }
 
-    @GetMapping("/createAccount")
+    @PostMapping("/createAccount")
     @CrossOrigin()
     public String createNewAccount(@RequestBody String json){
         String[] accountInformation = parseLoginJson(json);
         String username = accountInformation[0].replaceAll("\"", "");
         String password = accountInformation[1].replaceAll("\"", "");
-        System.out.println(json);
 
         if(accounts.accountExists(username)){
+            LOGGER.error("Attempted to create already existing account. ");
             throw new BadRequestException("account already exists");
         } else {
             if (accounts.createAccount(username, password)) {

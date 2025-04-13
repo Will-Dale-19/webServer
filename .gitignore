@@ -1,5 +1,7 @@
 node_modules
 
+testData
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
