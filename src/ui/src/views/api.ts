@@ -1,34 +1,34 @@
 import {useUserStore} from "@/stores/user.ts";
+import { ErrorStatus } from "@/types/enums";
 
-export async function login(credentials : Object): Promise<any> {
-
-    return fetch(`http://localhost:8080/api/login`, {
+export async function login(credentials: Object): Promise<any> {
+    const response = await fetch(`http://localhost:8080/api/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(credentials)
-    })
-        .then(checkError)
-        .then(data => data.json())
+    });
+
+    await checkError(response);
+    return response.json();
 }
 
 export async function createNewAccount(credentials: Object): Promise<any> {
-    return fetch(`http://localhost:8080/api/createAccount`, {
+    const response = await fetch(`http://localhost:8080/api/createAccount`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(credentials)
     })
-        .then(checkError)
-        .then(data => data.json())
+    await checkError(response);
+    return response.json();
 }
 
 export async function getServers(): Promise<any> {
     return useUserStore().token === "admin" ? adminGetAll() : getUserServers(useUserStore().username)
         .then(checkError)
-
 }
 
 export async function getServerStatus(serverName : string): Promise<any> {
@@ -51,15 +51,15 @@ export async function startServer(serverName: string): Promise<any> {
 }
 
 export async function stopServer(serverName: string): Promise<any> {
-    return fetch(`http://localhost:8080/api/servers/stopServer`, {
+    const response = await fetch(`http://localhost:8080/api/servers/stopServer`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(serverName)
     })
-        .then(checkError)
-        .then(data => data.json())
+    await checkError(response);
+    return response.json();
 }
 
 function adminGetAll()  {
@@ -81,13 +81,19 @@ function getUserServers(username : string) {
     })
 }
 
-const checkError = (response : Response) => {
-    if(response.status !== 200){
-        showApiError();
+const checkError = async (response : Response) => {
+    if (response.status === 401) {
+        const body = await response.json()
+        const errorMessage : String = body?.error
+        if (errorMessage === ErrorStatus.INVALID_ACCOUNT) {
+            throw new Error("Account was not found")
+        } else if (errorMessage === ErrorStatus.INCORRECT_PASSWORD) {
+            throw new Error("Incorrect Password")
+        } else {
+            throw new Error("Unauthorized error")
+        }
+    } else if(response.status !== 200){
+        throw new Error("Api Error");
     }
     return response;
-}
-
-function showApiError() {
-    throw new Error("Api Error");
 }

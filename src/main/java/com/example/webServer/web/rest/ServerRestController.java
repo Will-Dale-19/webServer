@@ -5,10 +5,24 @@ import com.example.webServer.data.entities.ServerEntity;
 import com.example.webServer.data.repositories.Accounts;
 import com.example.webServer.services.ServerService;
 import com.example.webServer.web.errors.BadRequestException;
+import com.example.webServer.web.errors.IncorrectPasswordException;
+import com.example.webServer.web.errors.InvalidAccountException;
 import com.example.webServer.web.models.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +45,7 @@ public class ServerRestController {
     }
 
     @GetMapping("/servers")
-    public List<Server> getAll(@RequestParam(name="serverName", required = false)String serverName){
+    public List<Server> getAll(@RequestParam(name="serverName", required = false)String serverName) {
         List<Server> servers = this.serverService.getAlLServers(serverName);
 
         if (serverName != null) {
@@ -48,7 +62,7 @@ public class ServerRestController {
     }
 
     @PostMapping("/servers/getUserServers")
-    public List<Server> getUserServers(@RequestBody String json){
+    public List<Server> getUserServers(@RequestBody String json) {
         String username = json.replaceAll("\"", "");
 
         LOGGER.info("{} is requesting their servers.", username);
@@ -63,7 +77,7 @@ public class ServerRestController {
 
 
     @GetMapping("/servers/getServerStatus/{serverName}")
-    public String getServerStatus(@PathVariable(name = "serverName") String serverName){
+    public String getServerStatus(@PathVariable(name = "serverName") String serverName) {
         serverName = serverName.replaceAll("\"", "");
 
         LOGGER.info("Getting status of: {} it is: {}", serverName, runningProcesses.containsKey(serverName));
@@ -72,7 +86,7 @@ public class ServerRestController {
     }
 
     @PostMapping("/servers/startServer")
-    public String startServer(@RequestBody String serverName){
+    public String startServer(@RequestBody String serverName) {
         serverName = serverName.replaceAll("\"", "");
 
         LOGGER.info("Attempting to start server: {}", serverName);
@@ -107,7 +121,7 @@ public class ServerRestController {
     }
 
     @PostMapping("/servers/stopServer")
-    public String stopServer(@RequestBody String serverName){
+    public String stopServer(@RequestBody String serverName) {
         serverName = serverName.replaceAll("\"", "");
 
         LOGGER.info("Attempting to stop server: {}", serverName);
@@ -127,7 +141,7 @@ public class ServerRestController {
 
     @PostMapping("/login")
     @CrossOrigin()
-    public String getLoginToken(@RequestBody String jsonLoginInformation){
+    public String getLoginToken(@RequestBody String jsonLoginInformation) {
         String[] loginInformation = parseLoginJson(jsonLoginInformation);
 
         String username = loginInformation[0].replaceAll("\"", "");
@@ -135,19 +149,38 @@ public class ServerRestController {
 
         LOGGER.info("Attempting to log in user: {}", username);
 
-        if (!accounts.isValidAccount(username, password)){
-            LOGGER.info("Bad login attempt from: {}", username);
-            throw new BadRequestException("invalid login information");
+        if (!accounts.isValidAccount(username)) {
+            LOGGER.info("Bad login attempt from: {}, username does not exist", username);
+            throw new InvalidAccountException("invalid account username");
         } else {
-            // TODO give an actual token
-            LOGGER.info("User successfully authorized: {}", username);
-            return "{\"token\": \"" +username+"\"}";
+            if (accounts.isValidPassword(username, password)) {
+                // TODO give an actual token
+                LOGGER.info("User successfully authorized: {}", username);
+                return "{\"token\": \"" + username + "\"}";
+            } else {
+                LOGGER.info("Bad login attempt from: {}, password is incorrect", username);
+                throw new IncorrectPasswordException("incorrect password");
+            }
         }
+    }
+
+    @ExceptionHandler(InvalidAccountException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    private String onInvalidAccountException() {
+        return "{\"error\": \"" + "account not found" + "\"}";
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    private String onIncorrectPasswordException() {
+        return "{\"error\": \"" + "incorrect password" + "\"}";
     }
 
     @PostMapping("/createAccount")
     @CrossOrigin()
-    public String createNewAccount(@RequestBody String json){
+    public String createNewAccount(@RequestBody String json) {
         String[] accountInformation = parseLoginJson(json);
         String username = accountInformation[0].replaceAll("\"", "");
         String password = accountInformation[1].replaceAll("\"", "");
@@ -165,13 +198,14 @@ public class ServerRestController {
 
     }
 
-    private String[] parseLoginJson(String jsonObj){
+    private String[] parseLoginJson(String jsonObj) {
         String[] loginInformation = jsonObj.split(",");
         String[] returnArray = new String[2];
         returnArray[0] = loginInformation[0].split(":")[1];
         returnArray[1] = loginInformation[1].split(":")[1].replaceAll("}", "");
         return returnArray;
     }
+
 
 
 }

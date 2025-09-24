@@ -15,7 +15,7 @@ watch(() => store.username, () => {
 </script>
 
 <template>
-  <div v-if="userRef">
+  <div v-if="userRef" class="userDisplay">
     <h3>Logged in: {{userRef}}</h3>
     <RouterLink to="/login">Log out</RouterLink>
   </div>
@@ -25,5 +25,11 @@ watch(() => store.username, () => {
 </template>
 
 <style scoped>
+
+div .userDisplay {
+  display: flex;
+  place-items: flex-start;
+
+}
 
 </style>
