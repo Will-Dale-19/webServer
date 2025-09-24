@@ -41,6 +41,7 @@ if (savedUserStr != null) {
 <style scoped>
 header {
   line-height: 1.5;
+  font-size: 24px;
   max-height: 200vh;
   width: 100%;
 }

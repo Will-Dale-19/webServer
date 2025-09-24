@@ -76,12 +76,15 @@ public class Accounts {
     }
 
     /**
-     * Function to see if the given credentials can log into an account.
+     * Function to see if the given username ties to a created account.
      * @param username username of the account
-     * @param password password of the account
-     * @return whether the login was successful or not.
+     * @return whether the username is valid or not.
      */
-    public boolean isValidAccount(String username, String password) {
+    public boolean isValidAccount(String username) {
+        return records.containsKey(username);
+    }
+
+    public boolean isValidPassword(String username, String password) {
         return records.containsKey(username) && records.get(username).equals(password);
     }
 
